@@ -1,23 +1,46 @@
+const HtmlWebPackPlugin = require("html-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
+const path = require("path");
+
+const APP_DIR = path.resolve(__dirname, "src");
+
 module.exports = {
-  entry: ["./src/index.js"],
-  output: {
-    path: (__dirname = "/build"),
-    publicPath: "/",
-    filename: "bundle.js",
-  },
-  devServer: {
-    contentBase: "./build",
-  },
+  entry: ["babel-polyfill", `${APP_DIR}/app.js`],
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.css$/,
+        use: [{ loader: "style-loader" }, { loader: "css-loader" }],
+      },
+      {
+        test: /\.js(x*)?$/,
+        resolve: {
+          extensions: [".js", ".jsx"],
+        },
         exclude: /node_modules/,
-        use: ["babel-loader"],
+        use: {
+          loader: "babel-loader",
+        },
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {},
+          },
+        ],
       },
     ],
   },
-  resolve: {
-    extensions: [".js", ".jsx"],
+  devServer: {
+    historyApiFallback: true,
   },
+  plugins: [
+    new HtmlWebPackPlugin({
+      template: "./src/index.html",
+      filename: "./index.html",
+    }),
+    new Dotenv(),
+  ],
 };
